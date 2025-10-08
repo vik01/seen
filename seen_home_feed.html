@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seen - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #001f3f;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #001f3f;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #001f3f;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 30px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-card h3 {
+            color: #001f3f;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .filter-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-item:hover {
+            background: #f0f4ff;
+            color: #001f3f;
+        }
+
+        .filter-item.active {
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            color: white;
+        }
+
+        .filter-icon {
+            font-size: 20px;
+        }
+
+        .main-feed {
+            max-width: 700px;
+        }
+
+        .create-post {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        .create-post-input {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .create-post-input input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .create-post-input input:hover {
+            border-color: #001f3f;
+            background: white;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .post-action-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .post-action-btn:hover {
+            background: #f0f4ff;
+            color: #001f3f;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .post-card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .post-user-name {
+            font-weight: 700;
+            color: #001f3f;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .post-user-meta {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .post-badge {
+            padding: 4px 10px;
+            background: #f0f4ff;
+            color: #001f3f;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+        }
+
+        .post-text {
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .post-tag {
+            padding: 6px 12px;
+            background: #f0f4ff;
+            color: #001f3f;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .post-media {
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .post-media img {
+            width: 100%;
+            display: block;
+        }
+
+        .post-media-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .post-media-grid img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .post-project-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .post-project-card:hover {
+            border-color: #001f3f;
+            background: #f0f4ff;
+        }
+
+        .project-title {
+            font-weight: 700;
+            color: #001f3f;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .project-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .project-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 20px;
+            padding: 12px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .post-interactions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .interaction-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .interaction-btn:hover {
+            background: #f0f4ff;
+            color: #001f3f;
+        }
+
+        .interaction-btn.liked {
+            color: #e74c3c;
+        }
+
+        .right-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .trending-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .trending-card h3 {
+            color: #001f3f;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .trending-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trending-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-item:hover {
+            padding-left: 10px;
+        }
+
+        .trending-tag {
+            font-weight: 700;
+            color: #001f3f;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .trending-count {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .suggested-users {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .suggested-users h3 {
+            color: #001f3f;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .suggested-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .suggested-user:last-child {
+            border-bottom: none;
+        }
+
+        .suggested-user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .suggested-user-info {
+            flex: 1;
+        }
+
+        .suggested-user-name {
+            font-weight: 700;
+            color: #001f3f;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .suggested-user-skill {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .follow-btn {
+            padding: 6px 16px;
+            background: #001f3f;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .follow-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .load-more {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .load-more-btn {
+            padding: 12px 30px;
+            background: white;
+            border: 2px solid #001f3f;
+            color: #001f3f;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .load-more-btn:hover {
+            background: #001f3f;
+            color: white;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar,
+            .right-sidebar {
+                display: none;
+            }
+
+            .main-feed {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .post-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">seen</div>
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#">Projects</a>
+            <a href="#">Communities</a>
+            <a href="#">Recruiters</a>
+            <a href="#">Messages</a>
+        </div>
+        <div class="profile-icon">JD</div>
+    </nav>
+
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3>Feed Filters</h3>
+                <div class="filter-item active">
+                    <span class="filter-icon">🏠</span>
+                    <span>All Updates</span>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-icon">👥</span>
+                    <span>Friends</span>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-icon">🎯</span>
+                    <span>Communities</span>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-icon">📁</span>
+                    <span>Projects Only</span>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-icon">🏆</span>
+                    <span>Achievements</span>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Your Communities</h3>
+                <div class="filter-item">
+                    <span class="filter-icon">💻</span>
+                    <span>Code Collective</span>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-icon">🎨</span>
+                    <span>Design Lab</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Feed -->
+        <main class="main-feed">
+            <!-- Create Post -->
+            <div class="create-post">
+                <div class="create-post-input">
+                    <div class="user-avatar">JD</div>
+                    <input type="text" placeholder="Share what you're working on...">
+                </div>
+                <div class="post-actions">
+                    <button class="post-action-btn">
+                        <span>📁</span> Project
+                    </button>
+                    <button class="post-action-btn">
+                        <span>📸</span> Photo
+                    </button>
+                    <button class="post-action-btn">
+                        <span>🎯</span> Achievement
+                    </button>
+                </div>
+            </div>
+
+            <!-- Post with Project -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">SM</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">Sarah Martinez</div>
+                        <div class="post-user-meta">Code Collective · 2 hours ago</div>
+                    </div>
+                    <div class="post-badge">Project</div>
+                </div>
+                <div class="post-content">
+                    <p class="post-text">Just finished my AI-powered study buddy app! 🎉 It uses machine learning to create personalized study plans based on your learning patterns. Huge thanks to the Code Collective community for the feedback!</p>
+                    <div class="post-tags">
+                        <span class="post-tag">Python</span>
+                        <span class="post-tag">TensorFlow</span>
+                        <span class="post-tag">React</span>
+                        <span class="post-tag">AI/ML</span>
+                    </div>
+                    <div class="post-project-card">
+                        <div class="project-title">StudyBuddy AI</div>
+                        <div class="project-description">An intelligent study companion that adapts to your learning style and helps you study more efficiently using AI-powered recommendations.</div>
+                        <div class="project-stats">
+                            <span>⭐ Verified by Code Collective</span>
+                            <span>👁️ 247 views</span>
+                        </div>
+                    </div>
+                    <div class="post-media">
+                        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800" alt="Project screenshot">
+                    </div>
+                </div>
+                <div class="post-stats">
+                    <span>❤️ 48 likes</span>
+                    <span>💬 12 comments</span>
+                    <span>🔄 8 shares</span>
+                </div>
+                <div class="post-interactions">
+                    <button class="interaction-btn">
+                        <span>❤️</span> Like
+                    </button>
+                    <button class="interaction-btn">
+                        <span>💬</span> Comment
+                    </button>
+                    <button class="interaction-btn">
+                        <span>🔄</span> Share
+                    </button>
+                </div>
+            </div>
+
+            <!-- Achievement Post -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">AL</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">Alex Lee</div>
+                        <div class="post-user-meta">Design Lab · 5 hours ago</div>
+                    </div>
+                    <div class="post-badge" style="background: #fff3cd; color: #856404;">Achievement</div>
+                </div>
+                <div class="post-content">
+                    <div class="achievement-badge">
+                        <span>🏆</span> Hackathon Winner
+                    </div>
+                    <p class="post-text">Thrilled to announce that our team won first place at the University Design Hackathon! Our project focused on making campus resources more accessible for students with disabilities. Can't wait to develop this further! 💪</p>
+                    <div class="post-media-grid">
+                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400" alt="Team photo">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400" alt="Award">
+                    </div>
+                </div>
+                <div class="post-stats">
+                    <span>❤️ 156 likes</span>
+                    <span>💬 34 comments</span>
+                    <span>🔄 21 shares</span>
+                </div>
+                <div class="post-interactions">
+                    <button class="interaction-btn liked">
+                        <span>❤️</span> Liked
+                    </button>
+                    <button class="interaction-btn">
+                        <span>💬</span> Comment
+                    </button>
+                    <button class="interaction-btn">
+                        <span>🔄</span> Share
+                    </button>
+                </div>
+            </div>
+
+            <!-- Community Update Post -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">💻</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">Code Collective</div>
+                        <div class="post-user-meta">Community Update · 8 hours ago</div>
+                    </div>
+                    <div class="post-badge" style="background: #e8f5e9; color: #2e7d32;">Community</div>
+                </div>
+                <div class="post-content">
+                    <p class="post-text">📢 Exciting news! We're launching our annual Hackathon 2025 next month! Open to all members. Form your teams, build something amazing, and win incredible prizes. Registration opens Monday!</p>
+                    <div class="post-tags">
+                        <span class="post-tag">Hackathon</span>
+                        <span class="post-tag">Event</span>
+                        <span class="post-tag">Coding</span>
+                    </div>
+                </div>
+                <div class="post-stats">
+                    <span>❤️ 89 likes</span>
+                    <span>💬 45 comments</span>
+                    <span>🔄 67 shares</span>
+                </div>
+                <div class="post-interactions">
+                    <button class="interaction-btn">
+                        <span>❤️</span> Like
+                    </button>
+                    <button class="interaction-btn">
+                        <span>💬</span> Comment
+                    </button>
+                    <button class="interaction-btn">
+                        <span>🔄</span> Share
+                    </button>
+                </div>
+            </div>
+
+            <!-- Regular Update Post -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">MJ</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">Marcus Johnson</div>
+                        <div class="post-user-meta">Startup Studio · 1 day ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p class="post-text">Day 30 of building my startup! 🚀 Just finished the MVP for our sustainable fashion marketplace. It's been a wild ride learning about e-commerce, supply chains, and sustainable practices. Looking for feedback from the community!</p>
+                    <div class="post-tags">
+                        <span class="post-tag">Entrepreneurship</span>
+                        <span class="post-tag">Sustainability</span>
+                        <span class="post-tag">E-commerce</span>
+                    </div>
+                    <div class="post-media">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800" alt="Dashboard">
+                    </div>
+                </div>
+                <div class="post-stats">
+                    <span>❤️ 72 likes</span>
+                    <span>💬 18 comments</span>
+                    <span>🔄 5 shares</span>
+                </div>
+                <div class="post-interactions">
+                    <button class="interaction-btn">
+                        <span>❤️</span> Like
+                    </button>
+                    <button class="interaction-btn">
+                        <span>💬</span> Comment
+                    </button>
+                    <button class="interaction-btn">
+                        <span>🔄</span> Share
+                    </button>
+                </div>
+            </div>
+
+            <!-- Friend's Update -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">EP</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">Emma Patel</div>
+                        <div class="post-user-meta">Your connection · 2 days ago</div>
+                    </div>
+                    <div class="post-badge">Project</div>
+                </div>
+                <div class="post-content">
+                    <p class="post-text">Finally completed my capstone project on climate data visualization! 🌍 This interactive dashboard shows real-time climate trends and predictions. Special thanks to my professor for the guidance.</p>
+                    <div class="post-tags">
+                        <span class="post-tag">Data Viz</span>
+                        <span class="post-tag">D3.js</span>
+                        <span class="post-tag">Climate</span>
+                    </div>
+                    <div class="post-project-card">
+                        <div class="project-title">Climate Insights Dashboard</div>
+                        <div class="project-description">Interactive visualization tool for exploring climate data trends, predictions, and regional impacts using machine learning models.</div>
+                        <div class="project-stats">
+                            <span>⭐ Verified by Professor</span>
+                            <span>👁️ 389 views</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-stats">
+                    <span>❤️ 103 likes</span>
+                    <span>💬 27 comments</span>
+                    <span>🔄 15 shares</span>
+                </div>
+                <div class="post-interactions">
+                    <button class="interaction-btn">
+                        <span>❤️</span> Like
+                    </button>
+                    <button class="interaction-btn">
+                        <span>💬</span> Comment
+                    </button>
+                    <button class="interaction-btn">
+                        <span>🔄</span> Share
+                    </button>
+                </div>
+            </div>
+
+            <div class="load-more">
+                <button class="load-more-btn">Load More Posts</button>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <div class="trending-card">
+                <h3>Trending Topics</h3>
+                <div class="trending-item">
+                    <div class="trending-tag">#AIProjects</div>
+                    <div class="trending-count">234 posts this week</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-tag">#WebDev</div>
+                    <div class="trending-count">189 posts this week</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-tag">#Hackathon2025</div>
+                    <div class="trending-count">156 posts this week</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-tag">#SustainableTech</div>
+                    <div class="trending-count">98 posts this week</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-tag">#UXDesign</div>
+                    <div class="trending-count">87 posts this week</div>
+                </div>
+            </div>
+
+            <div class="suggested-users">
+                <h3>People to Follow</h3>
+                <div class="suggested-user">
+                    <div class="suggested-user-avatar">KR</div>
+                    <div class="suggested-user-info">
+                        <div class="suggested-user-name">Kevin Rodriguez</div>
+                        <div class="suggested-user-skill">Full Stack Developer</div>
+                    </div>
+                    <button class="follow-btn">Follow</button>
+                </div>
+                <div class="suggested-user">
+                    <div class="suggested-user-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">LT

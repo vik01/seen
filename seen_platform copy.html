@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seen - Student Project Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .login-container {
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #001f3f 0%, #002a54 100%);
+            padding: 60px 40px;
+            color: white;
+        }
+
+        .login-logo {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 60px 50px;
+        }
+
+        .right-panel h2 {
+            color: #001f3f;
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+
+        .user-type {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .user-type button {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .user-type button.active {
+            background: #001f3f;
+            color: white;
+            border-color: #001f3f;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #001f3f;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            padding-bottom: 5px;
+        }
+
+        .nav-links a.active {
+            color: #001f3f;
+            border-bottom: 3px solid #001f3f;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #001f3f;
+            border: 2px solid #001f3f;
+        }
+
+        @media (max-width: 768px) {
+            .login-box {
+                flex-direction: column;
+            }
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="left-panel">
+                    <div class="login-logo">seen</div>
+                    <p style="font-size: 18px; line-height: 1.6; opacity: 0.9;">Your projects deserve to be seen. Connect with opportunities that matter.</p>
+                </div>
+                <div class="right-panel">
+                    <h2>Welcome back</h2>
+                    <div class="user-type">
+                        <button class="active" onclick="setUserType(this, 'student')">Student</button>
+                        <button onclick="setUserType(this, 'recruiter')">Recruiter</button>
+                    </div>
+                    <button class="btn-login" onclick="handleLogin()">Log in</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="page">
+        <nav class="navbar">
+            <div class="logo" onclick="navigateTo('home')">seen</div>
+            <div class="nav-links">
+                <a onclick="navigateTo('home')" data-page="home" class="active">Home</a>
+                <a onclick="navigateTo('projects')" data-page="projects">Projects</a>
+                <a onclick="navigateTo('communities')" data-page="communities">Communities</a>
+                <a onclick="navigateTo('profile')" data-page="profile">Profile</a>
+            </div>
+            <div class="profile-icon" onclick="navigateTo('profile')">JD</div>
+        </nav>
+        <div id="appContent"></div>
+    </div>
+
+    <script>
+        let currentUserType = 'student';
+
+        function setUserType(button, type) {
+            currentUserType = type;
+            document.querySelectorAll('.user-type button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        }
+
+        function handleLogin() {
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('mainApp').classList.add('active');
+            navigateTo('home');
+        }
+
+        function navigateTo(page) {
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.page === page) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const content = document.getElementById('appContent');
+            
+            if (page === 'home') {
+                content.innerHTML = `
+                    <div class="container" style="max-width: 900px;">
+                        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 25px;">
+                            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                                <div class="profile-icon" style="position: static;">JD</div>
+                                <input type="text" placeholder="Share what you're working on..." style="flex: 1; padding: 14px 20px; border: 2px solid #e0e0e0; border-radius: 25px; cursor: pointer;" onclick="navigateTo('projects')">
+                            </div>
+                            <div style="display: flex; gap: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
+                                <button class="btn btn-secondary" style="flex: 1;" onclick="navigateTo('projects')">📁 Project</button>
+                                <button class="btn btn-secondary" style="flex: 1;">📸 Photo</button>
+                                <button class="btn btn-secondary" style="flex: 1;">🎯 Achievement</button>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+                            <div style="display: flex; gap: 12px; margin-bottom: 15px;">
+                                <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">SM</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 700; color: #001f3f;">Sarah Martinez</div>
+                                    <div style="font-size: 13px; color: #999;">Code Collective · 2 hours ago</div>
+                                </div>
+                            </div>
+                            <p style="color: #333; line-height: 1.6; margin-bottom: 15px;">Just finished my AI-powered study buddy app! 🎉</p>
+                            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                                <span style="padding: 6px 12px; background: #f0f4ff; color: #001f3f; border-radius: 20px; font-size: 12px; font-weight: 600;">Python</span>
+                                <span style="padding: 6px 12px; background: #f0f4ff; color: #001f3f; border-radius: 20px; font-size: 12px; font-weight: 600;">AI/ML</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-secondary" style="flex: 1;">❤️ Like</button>
+                                <button class="btn btn-secondary" style="flex: 1;">💬 Comment</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (page === 'profile') {
+                content.innerHTML = `
+                    <div class="container">
+                        <div style="background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); overflow: hidden;">
+                            <div style="height: 200px; background: linear-gradient(135deg, #001f3f 0%, #003366 100%);"></div>
+                            <div style="padding: 0 40px 30px; position: relative;">
+                                <div style="display: flex; gap: 30px; margin-top: -80px;">
+                                    <div style="width: 160px; height: 160px; background: linear-gradient(135deg, #001f3f 0%, #003366 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; font-weight: 700; border: 6px solid white;">JD</div>
+                                    <div style="flex: 1; margin-top: 90px;">
+                                        <h1 style="font-size: 32px; font-weight: 700; color: #001f3f; margin-bottom: 10px;">Jordan Davis</h1>
+                                        <p style="color: #666; margin-bottom: 20px;">Computer Science Student | Full Stack Developer</p>
+                                        <button class="btn btn-primary" onclick="navigateTo('projects')">+ Add Project</button>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 30px; padding: 20px 0; border-top: 1px solid #f0f0f0; margin-top: 20px;">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #001f3f;">24</div>
+                                        <div style="font-size: 13px; color: #999;">PROJECTS</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #001f3f;">1.2K</div>
+                                        <div style="font-size: 13px; color: #999;">CONNECTIONS</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #001f3f;">8</div>
+                                        <div style="font-size: 13px; color: #999;">COMMUNITIES</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (page === 'communities') {
+                content.innerHTML = `
+                    <div class="container">
+                        <h1 style="color: #001f3f; font-size: 36px; margin-bottom: 40px;">Communities</h1>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px;">
+                            <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+                                <div style="height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                                <div style="padding: 20px;">
+                                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                        <div style="width: 60px; height: 60px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-top: -40px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">💻</div>
+                                        <div>
+                                            <div style="font-size: 20px; font-weight: 700; color: #001f3f;">Code Collective</div>
+                                            <div style="font-size: 13px; color: #999;">1,247 members</div>
+                                        </div>
+                                    </div>
+                                    <p style="color: #666; margin-bottom: 15px;">Build innovative software projects with fellow developers.</p>
+                                    <button class="btn btn-primary" style="width: 100%;">Join Community</button>
+                                </div>
+                            </div>
+                            <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+                                <div style="height: 120px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                                <div style="padding: 20px;">
+                                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                        <div style="width: 60px; height: 60px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-top: -40px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">🎨</div>
+                                        <div>
+                                            <div style="font-size: 20px; font-weight: 700; color: #001f3f;">Design Lab</div>
+                                            <div style="font-size: 13px; color: #999;">1,563 members</div>
+                                        </div>
+                                    </div>
+                                    <p style="color: #666; margin-bottom: 15px;">Collaborate on creative design projects.</p>
+                                    <button class="btn btn-primary" style="width: 100%;">Join Community</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (page === 'projects') {
+                content.innerHTML = `
+                    <div class="container" style="max-width: 900px;">
+                        <h1 style="color: #001f3f; font-size: 36px; margin-bottom: 10px; text-align: center;">Publish Your Project</h1>
+                        <p style="color: #666; margin-bottom: 40px; text-align: center;">Share your work with recruiters and the community</p>
+                        
+                        <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
+                            <h2 style="color: #001f3f; font-size: 24px; margin-bottom: 30px;">Project Details</h2>
+                            
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #001f3f; font-weight: 600; margin-bottom: 8px;">Project Title *</label>
+                                <input type="text" placeholder="Enter your project title" style="width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px;">
+                            </div>
+                            
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #001f3f; font-weight: 600; margin-bottom: 8px;">Description *</label>
+                                <textarea placeholder="Describe your project..." style="width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; min-height: 120px; font-size: 15px; font-family: inherit;"></textarea>
+                            </div>
+                            
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #001f3f; font-weight: 600; margin-bottom: 8px;">Category *</label>
+                                <select style="width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px;">
+                                    <option>Select a category</option>
+                                    <option>Web Development</option>
+                                    <option>Mobile App</option>
+                                    <option>AI/Machine Learning</option>
+                                    <option>Design</option>
+                                </select>
+                            </div>
+                            
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #001f3f; font-weight: 600; margin-bottom: 8px;">Project URL</label>
+                                <input type="url" placeholder="https://github.com/yourproject" style="width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px;">
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
+                                <button class="btn btn-secondary" onclick="navigateTo('home')">Cancel</button>
+                                <button class="btn btn-primary" onclick="alert('Project submitted!'); navigateTo('profile');">Submit Project</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
