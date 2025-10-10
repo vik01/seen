@@ -7,13 +7,17 @@ def seen(request):
     return HttpResponse(template.render())
 
 def home(request):
-    return render(request, 'seen_home_feed.html')
+    template = loader.get_template('seen_home_feed.html')
+    return HttpResponse(template.render())
 
 def profile(request):
-    return render(request, 'seen_profile_page.html')
+    template = loader.get_template('seen_profile_page.html')
+    return HttpResponse(template.render())
 
 def communities(request):
-    return render(request, 'seen_communities_page.html')
+    template = loader.get_template('seen_communities_page.html')
+    return HttpResponse(template.render())
 
 def publish_project(request):
-    return render(request, 'seen_publish_project.html')
+    template = loader.get_template('seen_publish_project.html')
+    return HttpResponse(template.render())
