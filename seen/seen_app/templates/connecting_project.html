@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seen - Connecting Account</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #001f3f;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #001f3f;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .connection-box {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 10vh;
+            background: #FFFBF0;
+            border-radius: 25px;
+            padding: 60px;
+            box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .connection-box h2 {
+            color: #001f3f;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .connection-text {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .platform-name {
+            color: #001f3f;
+            font-weight: 700;
+        }
+
+        .continue-button {
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 31, 63, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .continue-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 31, 63, 0.4);
+        }
+
+        .continue-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .connection-box {
+                padding: 40px 30px;
+                margin-top: 5vh;
+            }
+
+            .connection-box h2 {
+                font-size: 24px;
+            }
+
+            .connection-text {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">seen</div>
+        <div class="nav-links">
+            <a href="/home">Home</a>
+            <a href="/add_project" class="active">Projects</a>
+            <a href="/communities">Communities</a>
+            <a href="#">Recruiters</a>
+            <a href="#">Messages</a>
+        </div>
+        <a href="/profile"><div class="profile-icon">JD</div></a>
+    </nav>
+
+    <div class="container">
+        <div class="connection-box">
+            <h2>Connecting Your Account</h2>
+            <p class="connection-text">
+                We have opened another tab to connect your <span class="platform-name" id="platformName">account</span> to your Seen account. 
+                Please follow the instructions and once you have connected, click the continue button to see your updated profile.
+            </p>
+            <button class="continue-button" onclick="continueToProfile()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Get platform name from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const platform = urlParams.get('platform');
+        
+        if (platform) {
+            document.getElementById('platformName').textContent = platform;
+        }
+
+        function continueToProfile() {
+            // Redirect to profile page or wherever you want
+            window.location.href = 'seen_profile_page.html';
+            // Or you can use: window.location.href = 'profile.html';
+        }
+    </script>
+</body>
+</html>
