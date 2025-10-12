@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seen - Communities</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: #f5f7fa; min-height: 100vh;
+      }
+      .navbar { background: #fff; padding: 20px 40px; box-shadow: 0 2px 10px rgba(0,0,0,.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+      .logo { font-size: 28px; font-weight: 700; color: #001f3f; cursor: pointer; }
+      .nav-links { display: flex; gap: 30px; align-items: center; }
+      .nav-links a { color: #666; text-decoration: none; font-weight: 500; transition: color .3s ease; }
+      .nav-links a:hover, .nav-links a.active { color: #001f3f; }
+      .profile-icon { width: 40px; height: 40px; background: linear-gradient(135deg,#001f3f 0%,#003366 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; cursor: pointer; }
+
+      .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+      .page-header { margin-bottom: 30px; padding: 0 20px; }
+      .page-title { font-size: 32px; font-weight: 700; color: #001f3f; margin-bottom: 10px; }
+      .page-subtitle { font-size: 16px; color: #666; }
+      .back-button { display: inline-flex; align-items: center; gap: 8px; color: #001f3f; text-decoration: none; font-weight: 600; margin-bottom: 20px; transition: all .3s ease; cursor: pointer; }
+      .back-button:hover { gap: 12px; }
+
+      .communities-container { position: relative; }
+      .communities-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 25px;
+        margin-bottom: 20px;
+      }
+      .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .pagination-btn {
+        background: #fff;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .3s ease;
+      }
+      .pagination-btn:hover:not(:disabled) {
+        border-color: #001f3f;
+        color: #001f3f;
+      }
+      .pagination-btn:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+      }
+      #page-info { font-weight: 600; color: #666; }
+
+      .community-card { 
+        background: #fff; border-radius: 16px; padding: 30px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,.08); transition: all .3s ease; 
+        cursor: pointer; display: flex; flex-direction: column; 
+      }
+      .community-card-content { flex-grow: 1; }
+      .community-card:hover { transform: translateY(-5px); box-shadow: 0 6px 25px rgba(0,31,63,.15); }
+      .community-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+      .community-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+      .community-info h3 { font-size: 20px; color: #001f3f; margin-bottom: 5px; }
+      .community-info p { font-size: 13px; color: #999; }
+      .community-description { color: #666; line-height: 1.6; font-size: 15px; margin-bottom: 20px; }
+      .community-stats { display: flex; gap: 20px; margin-bottom: 20px; padding-top: 15px; border-top: 1px solid #f0f0f0; }
+      .community-stat { font-size: 13px; color: #666; }
+      .community-stat strong { color: #001f3f; font-weight: 600; }
+      .btn { padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .3s ease; border: none; width: 100%; }
+      .btn-join { background: linear-gradient(135deg,#001f3f 0%,#003366 100%); color: #fff; box-shadow: 0 4px 15px rgba(0,31,63,.3); }
+      .btn-join:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,31,63,.4); }
+      .btn-joined { background: #fff; color: #4caf50; border: 2px solid #4caf50; }
+
+      .section-card { background: #fff; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,.08); margin-bottom: 25px; }
+
+      .post-card { border: 2px solid #e0e0e0; border-radius: 12px; padding: 25px; margin-bottom: 20px; transition: all .3s ease; cursor: pointer; }
+      .post-card:hover { border-color: #001f3f; box-shadow: 0 4px 15px rgba(0,31,63,.1); }
+      .post-header { display: flex; gap: 15px; margin-bottom: 15px; }
+      .post-avatar { width: 50px; height: 50px; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 18px; flex-shrink: 0; }
+      .post-user-info h4 { font-size: 16px; color: #001f3f; margin-bottom: 3px; }
+      .post-meta { font-size: 13px; color: #999; }
+      .post-title { font-size: 20px; font-weight: 700; color: #001f3f; margin-bottom: 12px; }
+      .post-content { color: #666; line-height: 1.6; font-size: 15px; margin-bottom: 15px; }
+      .post-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+      .post-tag { padding: 6px 12px; background: #f0f4ff; color: #001f3f; border-radius: 20px; font-size: 12px; font-weight: 600; }
+      .post-stats { display: flex; gap: 20px; font-size: 14px; color: #666; padding-top: 15px; border-top: 1px solid #f0f0f0; }
+
+      .help-badge { display: inline-block; background: #ff6b6b; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+      .discussion-badge { display: inline-block; background: #4facfe; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+      .announcement-badge { display: inline-block; background: #8B5CF6; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+
+      .post-detail-container { background: #fff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,.08); margin-bottom: 30px; }
+      .post-detail-title { font-size: 28px; font-weight: 700; color: #001f3f; margin-bottom: 20px; line-height: 1.3; }
+      .post-detail-content { color: #333; line-height: 1.8; font-size: 16px; margin-bottom: 20px; }
+
+      .post-actions { display: flex; gap: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0; flex-wrap: wrap; }
+      .action-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border: 2px solid #e0e0e0; background: #fff; border-radius: 8px; font-size: 14px; font-weight: 600; color: #666; cursor: pointer; transition: all .3s ease; }
+      .action-btn:hover { border-color: #001f3f; color: #001f3f; }
+      .action-btn.active { border-color: #001f3f; color: #001f3f; background: #f0f4ff; }
+
+      .comments-section { background: #fff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,.08); }
+      .comments-header { font-size: 22px; font-weight: 700; color: #001f3f; margin-bottom: 25px; }
+      .comment-card { border-left: 3px solid #e0e0e0; padding: 20px 0 20px 20px; margin-bottom: 25px; transition: border-color .3s ease; }
+      .comment-card:hover { border-left-color: #001f3f; }
+      .comment-header { display: flex; gap: 12px; margin-bottom: 12px; }
+      .comment-avatar { width: 45px; height: 45px; background: linear-gradient(135deg,#4facfe 0%,#00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+      .comment-user-info h4 { font-size: 15px; color: #001f3f; margin-bottom: 3px; }
+      .comment-user-info p { font-size: 12px; color: #999; }
+      .comment-content { color: #333; line-height: 1.7; font-size: 15px; margin-bottom: 12px; white-space: pre-wrap; }
+      .comment-actions { display: flex; gap: 15px; font-size: 13px; align-items: center; }
+      .comment-action { color: #666; cursor: pointer; transition: color .3s ease; display: inline-flex; align-items: center; gap: 4px; }
+      .comment-action:hover { color: #001f3f; }
+      .comment-action.active { color: #001f3f; font-weight: 700; }
+      .comment-action-delete { color: #ff6b6b; }
+      .replies-container { margin-left: 20px; padding-left: 20px; margin-top: 20px; border-left: 2px solid #f0f0f0; }
+      .reply-form { margin-top: 15px; padding-left: 57px; animation: fadeIn .3s ease; }
+      .reply-form textarea { width: 100%; min-height: 80px; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; }
+      .reply-form textarea:focus { outline: none; border-color: #001f3f; }
+      .reply-form button { margin-top: 10px; background: #001f3f; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+      .add-comment { margin-top: 30px; padding-top: 30px; border-top: 2px solid #f0f0f0; }
+      .add-comment-header { display: flex; gap: 15px; margin-bottom: 15px; }
+      .your-avatar { width: 50px; height: 50px; background: linear-gradient(135deg,#001f3f 0%,#003366 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 18px; flex-shrink: 0; }
+      .comment-input-wrapper { flex: 1; }
+      .comment-input { width: 100%; min-height: 120px; padding: 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; font-family: inherit; resize: vertical; transition: all .3s ease; }
+      .comment-input:focus { outline: none; border-color: #001f3f; }
+      .comment-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-left: 65px; }
+      .char-count { font-size: 13px; color: #999; }
+      .btn-primary { background: linear-gradient(135deg,#001f3f 0%,#003366 100%); color: #fff; box-shadow: 0 4px 15px rgba(0,31,63,.3); padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,31,63,.4); }
+      .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+      .success-message { background: #4caf50; color: #fff; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 600; animation: slideIn .4s ease; }
+
+      .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+      .modal.active { display: flex; }
+      .modal-content { background: #fff; border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; position: relative; animation: modalSlideIn .3s ease; }
+      @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+      .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 28px; cursor: pointer; color: #999; transition: color .3s ease; }
+      .modal-close:hover { color: #001f3f; }
+      .modal-header { margin-bottom: 25px; }
+      .modal-header h2 { color: #001f3f; font-size: 24px; margin-bottom: 10px; }
+      .share-list { list-style: none; }
+      .share-item { padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all .3s ease; display: flex; align-items: center; gap: 12px; }
+      .share-item:hover { border-color: #001f3f; background: #f0f4ff; }
+      .share-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+      .hidden { display: none; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+      @keyframes slideIn { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
+      .fade-in { animation: fadeIn .4s ease; }
+      .new-comment { animation: slideIn .4s ease; }
+      
+      @media (max-width: 1200px) {
+        .communities-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 768px) {
+        .navbar { padding: 15px 20px; }
+        .nav-links { display: none; }
+        .container { padding: 0; }
+        .page-header { padding: 0 20px; }
+        .communities-grid { grid-template-columns: 1fr; }
+        .post-detail-container, .comments-section, .section-card { padding: 25px 20px; }
+        .comment-footer { flex-direction: column; align-items: flex-start; gap: 10px; padding-left: 0; }
+        .post-actions { gap: 10px; }
+        .action-btn { font-size: 13px; padding: 8px 16px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo" onclick="backToCommunities()">seen</div>
+      <div class="nav-links" aria-label="Primary">
+        <a href="#">Home</a>
+        <a href="#">Projects</a>
+        <a href="#" class="active" aria-current="page">Communities</a>
+        <a href="#">Recruiters</a>
+        <a href="#">Messages</a>
+      </div>
+      <div class="profile-icon" title="Profile">JD</div>
+    </nav>
+
+    <div class="container">
+      <div id="communities-view">
+        <div class="page-header">
+          <h1 class="page-title">Communities</h1>
+          <p class="page-subtitle">Join communities to collaborate, learn, and grow together</p>
+        </div>
+        <div class="communities-container">
+          <div class="communities-grid" id="communities-grid"></div>
+          <div class="pagination-controls">
+            <button id="prev-page-btn" class="pagination-btn" onclick="prevPage()">‹ Previous</button>
+            <span id="page-info"></span>
+            <button id="next-page-btn" class="pagination-btn" onclick="nextPage()">Next ›</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="community-posts-view" class="hidden">
+        <div class="back-button" onclick="backToCommunities()">← Back to Communities</div>
+        <div class="page-header">
+          <h1 class="page-title" id="community-name"></h1>
+          <p class="page-subtitle" id="community-stats"></p>
+        </div>
+        <div class="section-card" id="posts-container"></div>
+      </div>
+
+      <div id="post-detail-view" class="hidden">
+        <div class="back-button" onclick="backToPosts()">← Back to Community</div>
+        <div class="post-detail-container" id="post-detail-container"></div>
+        <div class="comments-section">
+          <div id="success-message" class="success-message hidden">✓ Your comment has been posted successfully!</div>
+          <h3 class="comments-header" id="comments-count"></h3>
+          <div id="existing-comments"></div>
+          <div class="add-comment">
+            <div class="add-comment-header">
+              <div class="your-avatar">JD</div>
+              <div class="comment-input-wrapper">
+                <textarea id="comment-text" class="comment-input" placeholder="Share your thoughts..." oninput="updateCharCount()"></textarea>
+              </div>
+            </div>
+            <div class="comment-footer">
+              <span class="char-count" id="char-count">0 characters</span>
+              <button class="btn-primary" onclick="postComment()" id="post-btn" disabled>Post Comment</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="shareModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeShareModal()">×</button>
+        <div class="modal-header"><h2>Share to Community</h2></div>
+        <ul class="share-list" id="share-list"></ul>
+      </div>
+    </div>
+
+    <script>
+      const joinedCommunities = {};
+      let currentCommunity = null;
+      let currentPost = null;
+      const postVotes = {}; 
+      const postSaves = {}; 
+      const commentVotes = {};
+      
+      let currentPage = 1;
+      const itemsPerPage = 6;
+
+      const communities = {
+        python: {
+          name: '🐍 Python Developers',
+          stats: '2.4K members • 156 posts',
+          description: 'A vibrant community for Python enthusiasts. Share code, ask questions, and collaborate on projects.',
+          icon: '🐍',
+          gradient: 'linear-gradient(135deg, #3776ab 0%, #ffd43b 100%)',
+          activity: 'Active community',
+          posts: [
+            { id: 'python-1', badge: 'help', author: 'Vikram Bhatt', title: 'Help with API Data Pipeline', content: `Hey everyone! I'm working on a data pipeline project where I'm pulling data from a REST API...`, tags: ['Python', 'APIs'], views: 45, initialComments: 2, upvotes: 8, comments: [{id: 'c1', author: 'Sarah Park', initials: 'SP', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Data Engineer', time: '1 hour ago', content: "You'll need to loop through the pages!", upvotes: 4, replies: []}, {id: 'c1a', author: 'Raj Patel', initials: 'RP', avatar: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', role: 'Developer', time: '2 hours ago', content: 'Also, add a timeout to your requests.', upvotes: 2, replies: []}] },
+            { id: 'python-2', badge: 'discussion', author: 'Anna Liu', title: 'Best Practices for Python Project Structure?', content: `What's your preferred way to organize a medium-sized Python project?...`, tags: ['Python', 'Best Practices'], views: 123, initialComments: 2, upvotes: 34, comments: [{id: 'c2', author: 'Chen Wei', initials: 'CW', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Senior Python Developer', time: '4 hours ago', content: 'I follow the src-layout pattern.', upvotes: 12, replies: []}, {id: 'c2a', author: 'Maria Garcia', initials: 'MG', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Software Architect', time: '5 hours ago', content: 'Poetry for dependency management is a must.', upvotes: 8, replies: []}] },
+            { id: 'python-3', badge: 'discussion', author: 'Jasmine Chen', title: 'Is async overrated for data science?', content: `I've seen a big push for async libraries like asyncio and httpx. Is it really providing a significant performance boost for typical data science workflows?`, tags: ['Async', 'Performance'], views: 210, initialComments: 2, upvotes: 45, comments: [{id: 'c3', author: 'Tom Harding', initials: 'TH', avatar: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', role: 'Lead Data Scientist', time: '22 hours ago', content: "For I/O-bound tasks like hitting multiple APIs, async is a game-changer.", upvotes: 14, replies: []}, {id: 'c3a', author: 'Ben Carter', initials: 'BC', avatar: 'linear-gradient(135deg, #22D3EE 0%, #0EA5E9 100%)', role: 'Data Scientist', time: '1 day ago', content: 'I agree with Tom. For heavy computation, stick to multiprocessing.', upvotes: 7, replies: []}] },
+            { id: 'python-4', badge: 'help', author: 'Leo Barnes', title: 'Debugging a tricky list comprehension error', content: 'I have this list comprehension that is throwing a syntax error and I just can\'t see it. Can someone help?', tags: ['Debugging', 'Python'], views: 90, initialComments: 2, upvotes: 12, comments: [{id: 'c4', author: 'Emily White', initials: 'EW', avatar: 'linear-gradient(135deg, #D946EF 0%, #F472B6 100%)', role: 'Python Tutor', time: '30 minutes ago', content: 'Looks like you are missing a closing bracket.', upvotes: 5, replies: []}, {id: 'c4a', author: 'David Green', initials: 'DG', avatar: 'linear-gradient(135deg, #6EE7B7 0%, #34D399 100%)', role: 'Student', time: '1 hour ago', content: 'I ran into this same issue yesterday!', upvotes: 3, replies: []}] },
+            { id: 'python-5', badge: 'announcement', author: 'Admin', title: 'Community Update: New Code of Conduct', content: 'Please review our updated code of conduct. We want to ensure this remains a welcoming space for all developers.', tags: ['Community', 'Rules'], views: 500, initialComments: 2, upvotes: 100, comments: [{id: 'c5', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '1 day ago', content: 'Please read and adhere to the new rules.', upvotes: 20, replies: []}, {id: 'c5a', author: 'Chris Lee', initials: 'CL', avatar: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)', role: 'Member', time: '2 days ago', content: 'Thanks for the update!', upvotes: 15, replies: []}] }
+          ]
+        },
+        mcdonalds: {
+          name: "🍔 McDonald's Enjoyers",
+          stats: '12.3K members • 567 posts',
+          description: 'For the true connoisseurs of the Golden Arches. Share orders, deals, and secret menu hacks.',
+          icon: '🍔',
+          gradient: 'linear-gradient(135deg, #FFC837 0%, #FF8008 100%)',
+          activity: 'Extremely active',
+          posts: [
+            { id: 'mcd-1', badge: 'discussion', author: 'Tyler Matthews', title: 'The McFlurry Machine Was Actually Working', content: 'I don\'t know what timeline I\'ve entered but I went to my local McDonald\'s at 9 PM and they said the McFlurry machine was working.', tags: ['McFlurry', 'Miracle'], views: 1234, initialComments: 2, upvotes: 456, comments: [{id: 'mcd1a', author: 'Jenny Kim', initials: 'JK', avatar: 'linear-gradient(135deg, #FD297B 0%, #FF655B 100%)', role: 'McFlurry Enthusiast', time: '45 minutes ago', content: 'This is HUGE news!', upvotes: 123, replies: []}, {id: 'mcd1b', author: 'David Park', initials: 'DP', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Former Employee', time: '1 hour ago', content: 'Enjoy it while it lasts!', upvotes: 87, replies: []}] },
+            { id: 'mcd-2', badge: 'help', author: 'Alex Thompson', title: 'Best Value Menu Hacks for Under $5?', content: 'I\'m a college student trying to maximize my McDonald\'s experience on a tight budget. What are your best value menu combinations?', tags: ['Value Menu', 'Budget'], views: 890, initialComments: 2, upvotes: 234, comments: [{id: 'mcd2a', author: 'Rachel Green', initials: 'RG', avatar: 'linear-gradient(135deg, #FA8BFF 0%, #2BD2FF 100%)', role: 'Deal Hunter', time: '3 hours ago', content: 'Download the app!', upvotes: 89, replies: []}, {id: 'mcd2b', author: 'Joey Tribbiani', initials: 'JT', avatar: 'linear-gradient(135deg, #FFC837 0%, #FF8008 100%)', role: 'Foodie', time: '4 hours ago', content: 'Two McChickens is the way to go.', upvotes: 50, replies: []}] },
+            { id: 'mcd-3', badge: 'discussion', author: 'Kevin Malone', title: 'Which menu item removal hurt the most?', content: 'For me, it was the Snack Wrap. It was the perfect size, perfectly priced, and the crispy chicken was elite.', tags: ['Nostalgia', 'Menu'], views: 1500, initialComments: 2, upvotes: 800, comments: [{id: 'mcd3a', author: 'Pam Beesly', initials: 'PB', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Snack Wrap Lover', time: '1 day ago', content: 'I miss the Snack Wrap every day.', upvotes: 200, replies: []}, {id: 'mcd3b', author: 'Jim Halpert', initials: 'JH', avatar: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', role: 'Regular Guy', time: '2 days ago', content: 'The Arch Deluxe was underrated.', upvotes: 100, replies: []}] },
+            { id: 'mcd-4', badge: 'discussion', author: 'Jessica Day', title: 'My go-to order. Rate it.', content: 'McDouble, no pickles, no onion. Large fries, and a Coke. Sometimes I add a McFlurry.', tags: ['Order', 'Rating'], views: 600, initialComments: 2, upvotes: 300, comments: [{id: 'mcd4a', author: 'Nick Miller', initials: 'NM', avatar: 'linear-gradient(135deg, #FFC837 0%, #FF8008 100%)', role: 'Grump', time: '5 hours ago', content: 'Solid order.', upvotes: 75, replies: []}, {id: 'mcd4b', author: 'Winston Bishop', initials: 'WB', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Cat Lover', time: '6 hours ago', content: 'Needs more nuggets.', upvotes: 60, replies: []}] },
+            { id: 'mcd-5', badge: 'help', author: 'Michael Scott', title: 'How to get the most out of the rewards app?', content: 'I feel like I am not using the app to its full potential. Any tips?', tags: ['App', 'Rewards'], views: 400, initialComments: 2, upvotes: 150, comments: [{id: 'mcd5a', author: 'Dwight Schrute', initials: 'DS', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Assistant to the Regional Manager', time: '1 day ago', content: 'You are a fool if you are not using the app.', upvotes: 50, replies: []}, {id: 'mcd5b', author: 'Andy Bernard', initials: 'AB', avatar: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', role: 'Salesman', time: '2 days ago', content: 'The app is the bomb.', upvotes: 40, replies: []}] }
+          ]
+        },
+        consulting: {
+          name: '📊 Management Consulting',
+          stats: '9.1K members • 203 posts',
+          description: 'Case practice, frameworks, industry research, and life on the road for consultants.',
+          icon: '📊',
+          gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)',
+          activity: 'Very active',
+          posts: [
+            { id: 'con-1', badge: 'help', author: 'Priya Natarajan', title: 'Market Sizing: Top-Down vs Bottom-Up?', content: 'I have first-round interviews next week and keep mixing up when to use top-down vs bottom-up market sizing.', tags: ['Case Prep', 'Interviews'], views: 187, initialComments: 2, upvotes: 38, comments: [{id: 'con1a', author: 'Emily Carter', initials: 'EC', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Associate, MBB', time: '1 hour ago', content: 'Lead with bottom-up for new products.', upvotes: 15, replies: []}, {id: 'con1b', author: 'Jonas Weber', initials: 'JW', avatar: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', role: 'Senior Consultant', time: '2 hours ago', content: 'Always have a sanity check.', upvotes: 7, replies: []}] },
+            { id: 'con-2', badge: 'discussion', author: 'Marta Lopez', title: 'Best Practices for Client Readouts', content: 'What are your non-negotiables for executive readouts? I\'m coaching a new BA and would love examples.', tags: ['Storytelling', 'Decks'], views: 512, initialComments: 2, upvotes: 96, comments: [{id: 'con2a', author: 'Rahul Singh', initials: 'RS', avatar: 'linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%)', role: 'Principal', time: '5 hours ago', content: 'One takeaway per slide.', upvotes: 21, replies: []}, {id: 'con2b', author: 'Megan Chen', initials: 'MC', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Manager', time: '6 hours ago', content: 'Know your audience.', upvotes: 15, replies: []}] },
+            { id: 'con-3', badge: 'help', author: 'David Wallace', title: 'How to network without being annoying?', content: 'I\'m trying to network with consultants at my target firms, but I\'m worried about coming across as just another student.', tags: ['Networking', 'Career'], views: 400, initialComments: 2, upvotes: 90, comments: [{id: 'con3a', author: 'Charles Miner', initials: 'CM', avatar: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', role: 'Senior Manager', time: '2 days ago', content: 'Ask for their story, not a job.', upvotes: 30, replies: []}, {id: 'con3b', author: 'Karen Filippelli', initials: 'KF', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Consultant', time: '3 days ago', content: 'Be genuine.', upvotes: 20, replies: []}] },
+            { id: 'con-4', badge: 'discussion', author: 'Charles Miner', title: 'Is the travel worth it?', content: 'I am thinking about a career in consulting but the travel seems daunting. Is it worth it?', tags: ['Travel', 'Lifestyle'], views: 800, initialComments: 2, upvotes: 250, comments: [{id: 'con4a', author: 'Ryan Howard', initials: 'RH', avatar: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', role: 'Temp', time: '4 days ago', content: 'Depends on if you like airports.', upvotes: 50, replies: []}, {id: 'con4b', author: 'Kelly Kapoor', initials: 'KK', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Customer Service Rep', time: '5 days ago', content: 'Only if you get to go to Paris.', upvotes: 40, replies: []}] },
+            { id: 'con-5', badge: 'announcement', author: 'Admin', title: '2025 Salary Survey Results', content: 'The results are in! See how your compensation stacks up against your peers.', tags: ['Salary', 'Survey'], views: 2000, initialComments: 2, upvotes: 1000, comments: [{id: 'con5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '1 week ago', content: 'Please do not share confidential information.', upvotes: 100, replies: []}, {id: 'con5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '1 week ago', content: 'This is great data. Thanks for sharing.', upvotes: 80, replies: []}] }
+          ]
+        },
+        productmgmt: {
+          name: '🧭 Product Management',
+          stats: '7.4K members • 178 posts',
+          description: 'Strategy, roadmaps, experiments, and execution across B2B & B2C.',
+          icon: '🧭',
+          gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+          activity: 'Active community',
+          posts: [
+            { id: 'pm-1', badge: 'discussion', author: 'Daniel Kim', title: 'Minimal Viable PRD Templates', content: 'I\'m trying to standardize our PRDs without turning them into novels. What\'s the lean template you actually use?', tags: ['PRD', 'Templates'], views: 289, initialComments: 2, upvotes: 54, comments: [{id: 'pm1a', author: 'Alice Wang', initials: 'AW', avatar: 'linear-gradient(135deg, #60a5fa 0%, #818cf8 100%)', role: 'Director of Product', time: '40 minutes ago', content: 'One page is all you need.', upvotes: 18, replies: []}, {id: 'pm1b', author: 'Bob Smith', initials: 'BS', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'PM', time: '1 hour ago', content: 'I use a simple template with problem, solution, and metrics.', upvotes: 10, replies: []}] },
+            { id: 'pm-2', badge: 'help', author: 'Omar Farouk', title: 'A/B Test Sample Size: When to Stop?', content: 'Running an experiment with a 3% baseline conversion. Any tips on avoiding peeking?', tags: ['Experimentation', 'Growth'], views: 403, initialComments: 2, upvotes: 61, comments: [{id: 'pm2a', author: 'Nina Rossi', initials: 'NR', avatar: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)', role: 'Data Scientist', time: '4 hours ago', content: 'Pre-register your stop rule.', upvotes: 14, replies: []}, {id: 'pm2b', author: 'Grace Lee', initials: 'GL', avatar: 'linear-gradient(135deg, #60a5fa 0%, #818cf8 100%)', role: 'Growth PM', time: '5 hours ago', content: 'I use a sequential testing framework.', upvotes: 8, replies: []}] },
+            { id: 'pm-3', badge: 'discussion', author: 'Michael Scott', title: 'Most underrated skill for a PM?', content: 'Everyone talks about strategy and execution. But what\'s the one skill that you think is crucial but often overlooked?', tags: ['Skills', 'Career'], views: 600, initialComments: 2, upvotes: 150, comments: [{id: 'pm3a', author: 'Jan Levinson', initials: 'JL', avatar: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)', role: 'VP of Product', time: '1 day ago', content: 'The ability to say no.', upvotes: 50, replies: []}, {id: 'pm3b', author: 'David Brent', initials: 'DB', avatar: 'linear-gradient(135deg, #60a5fa 0%, #818cf8 100%)', role: 'General Manager', time: '2 days ago', content: 'Knowing when to delegate.', upvotes: 40, replies: []}] },
+            { id: 'pm-4', badge: 'help', author: 'Jan Levinson', title: 'How to prioritize features with limited resources?', content: 'We have a long backlog and limited engineering resources. What frameworks do you use to prioritize?', tags: ['Prioritization', 'Roadmap'], views: 500, initialComments: 2, upvotes: 120, comments: [{id: 'pm4a', author: 'Hunter', initials: 'H', avatar: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)', role: 'Assistant', time: '3 days ago', content: 'RICE framework is a good start.', upvotes: 30, replies: []}, {id: 'pm4b', author: 'Holly Flax', initials: 'HF', avatar: 'linear-gradient(135deg, #60a5fa 0%, #818cf8 100%)', role: 'HR Rep', time: '4 days ago', content: 'I like the Kano model.', upvotes: 20, replies: []}] },
+            { id: 'pm-5', badge: 'discussion', author: 'Holly Flax', title: 'Favorite product management books?', content: 'Looking for some new reads. What are your favorite books on product management?', tags: ['Books', 'Learning'], views: 300, initialComments: 2, upvotes: 80, comments: [{id: 'pm5a', author: 'Michael Scott', initials: 'MS', avatar: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)', role: 'Regional Manager', time: '5 days ago', content: 'Inspired by Marty Cagan.', upvotes: 20, replies: []}, {id: 'pm5b', author: 'Gabe Lewis', initials: 'GL', avatar: 'linear-gradient(135deg, #60a5fa 0%, #818cf8 100%)', role: 'Coordinator', time: '6 days ago', content: 'The Lean Startup.', upvotes: 15, replies: []}] }
+          ]
+        },
+        corporatefinance: {
+          name: '💼 Corporate Finance',
+          stats: '5.2K members • 134 posts',
+          description: 'FP&A, valuations, capital budgeting, and reporting for operators and analysts.',
+          icon: '💼',
+          gradient: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
+          activity: 'Active community',
+          posts: [
+            { id: 'cf-1', badge: 'help', author: 'Grace Patel', title: 'Monthly Forecast Variance Analysis', content: 'Our revenue variance this month is -6% vs plan. Leadership wants a crisp bridge.', tags: ['FP&A', 'Reporting'], views: 241, initialComments: 2, upvotes: 42, comments: [{id: 'cf1a', author: 'Leo Martins', initials: 'LM', avatar: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)', role: 'Finance Manager', time: '2 hours ago', content: 'Use a waterfall chart.', upvotes: 11, replies: []}, {id: 'cf1b', author: 'Sarah Jenkins', initials: 'SJ', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Analyst', time: '3 hours ago', content: 'Break it down by volume, price, and mix.', upvotes: 8, replies: []}] },
+            { id: 'cf-2', badge: 'discussion', author: 'Sophia Nguyen', title: 'WACC Inputs in 2025', content: 'Curious what teams are using for Rf right now and whether you bake in a recession scenario.', tags: ['Valuation', 'WACC'], views: 388, initialComments: 2, upvotes: 73, comments: [{id: 'cf2a', author: 'Irene Costa', initials: 'IC', avatar: 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)', role: 'Associate, IB', time: '6 hours ago', content: '10-year treasury is the standard.', upvotes: 20, replies: []}, {id: 'cf2b', author: 'Mark Cuban', initials: 'MC', avatar: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)', role: 'Investor', time: '7 hours ago', content: 'I use a higher risk premium.', upvotes: 15, replies: []}] },
+            { id: 'cf-3', badge: 'help', author: 'Angela Martin', title: 'Best way to automate month-end close?', content: 'We\'re a small team and our month-end close process is very manual. What tools are you using?', tags: ['Automation', 'Accounting'], views: 300, initialComments: 2, upvotes: 60, comments: [{id: 'cf3a', author: 'Oscar Martinez', initials: 'OM', avatar: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)', role: 'Accountant', time: '1 day ago', content: 'Look into Blackline.', upvotes: 15, replies: []}, {id: 'cf3b', author: 'Kevin Malone', initials: 'KM', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Accountant', time: '2 days ago', content: 'I use a spreadsheet.', upvotes: 10, replies: []}] },
+            { id: 'cf-4', badge: 'discussion', author: 'Oscar Martinez', title: 'Excel vs. Google Sheets for financial modeling?', content: 'What are the pros and cons of each for building complex financial models?', tags: ['Excel', 'Modeling'], views: 700, initialComments: 2, upvotes: 200, comments: [{id: 'cf4a', author: 'Angela Martin', initials: 'AM', avatar: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)', role: 'Accountant', time: '3 days ago', content: 'Excel is more powerful.', upvotes: 50, replies: []}, {id: 'cf4b', author: 'Kevin Malone', initials: 'KM', avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', role: 'Accountant', time: '4 days ago', content: 'Google Sheets is better for collaboration.', upvotes: 40, replies: []}] },
+            { id: 'cf-5', badge: 'announcement', author: 'Admin', title: 'New CFO just hired!', content: 'We are excited to announce that we have a new CFO. Please welcome them to the team!', tags: ['Hiring', 'News'], views: 1000, initialComments: 2, upvotes: 300, comments: [{id: 'cf5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '1 week ago', content: 'Congratulations to the new CFO!', upvotes: 50, replies: []}, {id: 'cf5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '1 week ago', content: 'This is great news!', upvotes: 40, replies: []}] }
+          ]
+        },
+        uidesign: {
+          name: '🎨 UI/UX Design',
+          stats: '6.8K members • 112 posts',
+          description: 'From wireframes to prototypes. A community for designers to share work and give feedback.',
+          icon: '🎨',
+          gradient: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
+          activity: 'Very active',
+          posts: [
+            { id: 'ui-1', badge: 'discussion', author: 'Elena Rodriguez', title: 'Go-to UI/UX design tools in 2025?', content: 'With so many tools on the market, I\'m curious what everyone\'s daily drivers are.', tags: ['UI Design', 'UX Tools'], views: 350, initialComments: 2, upvotes: 78, comments: [{id: 'ui1a', author: 'Ben Carter', initials: 'BC', avatar: 'linear-gradient(135deg, #22D3EE 0%, #0EA5E9 100%)', role: 'UX Lead', time: '2 hours ago', content: 'Figma is still king.', upvotes: 15, replies: []}, {id: 'ui1b', author: 'Olivia Chen', initials: 'OC', avatar: 'linear-gradient(135deg, #6EE7B7 0%, #34D399 100%)', role: 'Interaction Designer', time: '3 hours ago', content: 'I use Sketch for wireframing.', upvotes: 9, replies: []}] },
+            { id: 'ui-2', badge: 'help', author: 'Sam Wilson', title: 'Feedback Request: Portfolio landing page', content: 'I\'m a student trying to break into the industry and just finished the first version of my portfolio site.', tags: ['Portfolio', 'Feedback'], views: 520, initialComments: 2, upvotes: 102, comments: [{id: 'ui2a', author: 'Laura Evans', initials: 'LE', avatar: 'linear-gradient(135deg, #EC4899 0%, #F43F5E 100%)', role: 'Hiring Manager, Design', time: '7 hours ago', content: 'Make your about me section more personal.', upvotes: 25, replies: []}, {id: 'ui2b', author: 'Tom Haverford', initials: 'TH', avatar: 'linear-gradient(135deg, #22D3EE 0%, #0EA5E9 100%)', role: 'Entrepreneur', time: '8 hours ago', content: 'I would add more flair.', upvotes: 15, replies: []}] },
+            { id: 'ui-3', badge: 'discussion', author: 'Pam Beesly', title: 'How do you deal with creative block?', content: 'I\'m in the middle of a big project and I\'ve hit a wall. How do you get unstuck?', tags: ['Creative Block', 'Inspiration'], views: 400, initialComments: 2, upvotes: 100, comments: [{id: 'ui3a', author: 'Holly Flax', initials: 'HF', avatar: 'linear-gradient(135deg, #6EE7B7 0%, #34D399 100%)', role: 'Art Director', time: '1 day ago', content: 'I go for a walk.', upvotes: 30, replies: []}, {id: 'ui3b', author: 'Michael Scott', initials: 'MS', avatar: 'linear-gradient(135deg, #EC4899 0%, #F43F5E 100%)', role: 'Regional Manager', time: '2 days ago', content: 'I watch a movie.', upvotes: 20, replies: []}] },
+            { id: 'ui-4', badge: 'help', author: 'Holly Flax', title: 'Best way to present user research findings?', content: 'I have a lot of qualitative data from user interviews. What\'s the best way to present it to stakeholders?', tags: ['User Research', 'Presentation'], views: 300, initialComments: 2, upvotes: 70, comments: [{id: 'ui4a', author: 'Pam Beesly', initials: 'PB', avatar: 'linear-gradient(135deg, #6EE7B7 0%, #34D399 100%)', role: 'Illustrator', time: '3 days ago', content: 'I use a slide deck with quotes and key themes.', upvotes: 20, replies: []}, {id: 'ui4b', author: 'Michael Scott', initials: 'MS', avatar: 'linear-gradient(135deg, #EC4899 0%, #F43F5E 100%)', role: 'Regional Manager', time: '4 days ago', content: 'I make a video.', upvotes: 15, replies: []}] },
+            { id: 'ui-5', badge: 'discussion', author: 'Michael Scott', title: 'What is the most important principle of design?', content: 'If you had to pick one principle of design that is the most important, what would it be?', tags: ['Design Principles', 'Theory'], views: 600, initialComments: 2, upvotes: 200, comments: [{id: 'ui5a', author: 'Pam Beesly', initials: 'PB', avatar: 'linear-gradient(135deg, #6EE7B7 0%, #34D399 100%)', role: 'Illustrator', time: '5 days ago', content: 'Simplicity.', upvotes: 50, replies: []}, {id: 'ui5b', author: 'Holly Flax', initials: 'HF', avatar: 'linear-gradient(135deg, #EC4899 0%, #F43F5E 100%)', role: 'Art Director', time: '6 days ago', content: 'Empathy.', upvotes: 40, replies: []}] }
+          ]
+        },
+        investing: {
+          name: '📈 Investing & Stocks',
+          stats: '15.1K members • 890 posts',
+          description: 'Discussions on stocks, options, crypto, and long-term investing strategies.',
+          icon: '📈',
+          gradient: 'linear-gradient(135deg, #10B981 0%, #F59E0B 100%)',
+          activity: 'Extremely active',
+          posts: [
+            { id: 'inv-1', badge: 'discussion', author: 'Jordan Belfort', title: 'What are your top 3 stock picks for the next 5 years?', content: 'Looking for some new ideas. What are your top 3 stock picks for the next 5 years?', tags: ['Stocks', 'Long-term'], views: 5000, initialComments: 2, upvotes: 3000, comments: [{id: 'inv1a', author: 'Warren Buffett', initials: 'WB', avatar: 'linear-gradient(135deg, #10B981 0%, #F59E0B 100%)', role: 'Investor', time: '1 day ago', content: 'Buy what you know.', upvotes: 1000, replies: []}, {id: 'inv1b', author: 'Peter Lynch', initials: 'PL', avatar: 'linear-gradient(135deg, #F59E0B 0%, #10B981 100%)', role: 'Investor', time: '2 days ago', content: 'Look for companies with a durable competitive advantage.', upvotes: 800, replies: []}] },
+            { id: 'inv-2', badge: 'help', author: 'Warren Buffett', title: 'How to value a company?', content: 'I am new to investing and want to learn how to value a company. Where should I start?', tags: ['Valuation', 'Fundamental Analysis'], views: 3000, initialComments: 2, upvotes: 2000, comments: [{id: 'inv2a', author: 'Peter Lynch', initials: 'PL', avatar: 'linear-gradient(135deg, #F59E0B 0%, #10B981 100%)', role: 'Investor', time: '3 days ago', content: 'Start with the balance sheet.', upvotes: 500, replies: []}, {id: 'inv2b', author: 'Cathie Wood', initials: 'CW', avatar: 'linear-gradient(135deg, #10B981 0%, #F59E0B 100%)', role: 'Investor', time: '4 days ago', content: 'Look at the growth potential.', upvotes: 400, replies: []}] },
+            { id: 'inv-3', badge: 'discussion', author: 'Cathie Wood', title: 'Is crypto a good investment?', content: 'What are your thoughts on crypto as a long-term investment? Is it a bubble or the future?', tags: ['Crypto', 'Bitcoin'], views: 4000, initialComments: 2, upvotes: 2500, comments: [{id: 'inv3a', author: 'Warren Buffett', initials: 'WB', avatar: 'linear-gradient(135deg, #10B981 0%, #F59E0B 100%)', role: 'Investor', time: '5 days ago', content: 'It is a bubble.', upvotes: 800, replies: []}, {id: 'inv3b', author: 'Peter Lynch', initials: 'PL', avatar: 'linear-gradient(135deg, #F59E0B 0%, #10B981 100%)', role: 'Investor', time: '6 days ago', content: 'I am not sure.', upvotes: 600, replies: []}] },
+            { id: 'inv-4', badge: 'help', author: 'Peter Lynch', title: 'How to find undervalued stocks?', content: 'I am looking for a good resource to find undervalued stocks. Any recommendations?', tags: ['Value Investing', 'Stock Picking'], views: 2000, initialComments: 2, upvotes: 1500, comments: [{id: 'inv4a', author: 'Warren Buffett', initials: 'WB', avatar: 'linear-gradient(135deg, #10B981 0%, #F59E0B 100%)', role: 'Investor', time: '1 week ago', content: 'Read the newspaper.', upvotes: 400, replies: []}, {id: 'inv4b', author: 'Cathie Wood', initials: 'CW', avatar: 'linear-gradient(135deg, #F59E0B 0%, #10B981 100%)', role: 'Investor', time: '1 week ago', content: 'Look for disruptive innovation.', upvotes: 300, replies: []}] },
+            { id: 'inv-5', badge: 'announcement', author: 'Admin', title: 'New rules on self-promotion', content: 'We are implementing new rules on self-promotion. Please review them before posting.', tags: ['Rules', 'Community'], views: 1000, initialComments: 2, upvotes: 500, comments: [{id: 'inv5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '2 weeks ago', content: 'Please read and adhere to the new rules.', upvotes: 100, replies: []}, {id: 'inv5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '2 weeks ago', content: 'Thanks for the update!', upvotes: 80, replies: []}] }
+          ]
+        },
+        gaming: {
+          name: '🎮 Gaming & Esports',
+          stats: '22.5K members • 1.2K posts',
+          description: 'News, reviews, and discussions on all things gaming.',
+          icon: '🎮',
+          gradient: 'linear-gradient(135deg, #8B5CF6 0%, #10B981 100%)',
+          activity: 'Extremely active',
+          posts: [
+            { id: 'game-1', badge: 'discussion', author: 'Ninja', title: 'What is the best battle royale game?', content: 'Fortnite or Warzone? Let\'s settle this once and for all.', tags: ['Battle Royale', 'Fortnite', 'Warzone'], views: 10000, initialComments: 2, upvotes: 8000, comments: [{id: 'game1a', author: 'Shroud', initials: 'S', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #10B981 100%)', role: 'Pro Gamer', time: '1 day ago', content: 'Warzone.', upvotes: 2000, replies: []}, {id: 'game1b', author: 'Dr Disrespect', initials: 'DD', avatar: 'linear-gradient(135deg, #10B981 0%, #8B5CF6 100%)', role: 'Pro Gamer', time: '2 days ago', content: 'H1Z1.', upvotes: 1500, replies: []}] },
+            { id: 'game-2', badge: 'help', author: 'Shroud', title: 'How to improve aim in FPS games?', content: 'I have been playing FPS games for years but my aim is still not great. Any tips?', tags: ['FPS', 'Aiming', 'Training'], views: 8000, initialComments: 2, upvotes: 6000, comments: [{id: 'game2a', author: 'Ninja', initials: 'N', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #10B981 100%)', role: 'Pro Gamer', time: '3 days ago', content: 'Practice.', upvotes: 1500, replies: []}, {id: 'game2b', author: 'Dr Disrespect', initials: 'DD', avatar: 'linear-gradient(135deg, #10B981 0%, #8B5CF6 100%)', role: 'Pro Gamer', time: '4 days ago', content: 'Get a good mouse.', upvotes: 1200, replies: []}] },
+            { id: 'game-3', badge: 'discussion', author: 'Pokimane', title: 'What is the most toxic gaming community?', content: 'We all know that some gaming communities can be toxic. Which one do you think is the worst?', tags: ['Community', 'Toxicity'], views: 12000, initialComments: 2, upvotes: 10000, comments: [{id: 'game3a', author: 'Ninja', initials: 'N', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #10B981 100%)', role: 'Pro Gamer', time: '5 days ago', content: 'League of Legends.', upvotes: 3000, replies: []}, {id: 'game3b', author: 'Shroud', initials: 'S', avatar: 'linear-gradient(135deg, #10B981 0%, #8B5CF6 100%)', role: 'Pro Gamer', time: '6 days ago', content: 'Dota 2.', upvotes: 2500, replies: []}] },
+            { id: 'game-4', badge: 'help', author: 'Dr Disrespect', title: 'Best streaming setup for under $1000?', content: 'I want to start streaming but I am on a budget. What is the best setup for under $1000?', tags: ['Streaming', 'Setup', 'Budget'], views: 6000, initialComments: 2, upvotes: 4000, comments: [{id: 'game4a', author: 'Ninja', initials: 'N', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #10B981 100%)', role: 'Pro Gamer', time: '1 week ago', content: 'Logitech C920 and a Blue Yeti.', upvotes: 1000, replies: []}, {id: 'game4b', author: 'Shroud', initials: 'S', avatar: 'linear-gradient(135deg, #10B981 0%, #8B5CF6 100%)', role: 'Pro Gamer', time: '1 week ago', content: 'Elgato Stream Deck is a must.', upvotes: 800, replies: []}] },
+            { id: 'game-5', badge: 'announcement', author: 'Admin', title: 'New community tournament!', content: 'We are excited to announce our first community tournament. Sign up now!', tags: ['Tournament', 'Esports'], views: 5000, initialComments: 2, upvotes: 3000, comments: [{id: 'game5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '2 weeks ago', content: 'Good luck to all participants!', upvotes: 500, replies: []}, {id: 'game5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '2 weeks ago', content: 'I am so excited for this!', upvotes: 400, replies: []}] }
+          ]
+        },
+        travel: {
+          name: '✈️ Travel & Adventure',
+          stats: '8.2K members • 212 posts',
+          description: 'Share your travel stories, tips, and recommendations.',
+          icon: '✈️',
+          gradient: 'linear-gradient(135deg, #3B82F6 0%, #10B981 100%)',
+          activity: 'Very active',
+          posts: [
+            { id: 'travel-1', badge: 'discussion', author: 'Anthony Bourdain', title: 'What is the best food you have ever eaten?', content: 'For me, it was a bowl of pho in Hanoi. What about you?', tags: ['Food', 'Cuisine'], views: 3000, initialComments: 2, upvotes: 2000, comments: [{id: 'travel1a', author: 'Rick Steves', initials: 'RS', avatar: 'linear-gradient(135deg, #3B82F6 0%, #10B981 100%)', role: 'Travel Writer', time: '1 day ago', content: 'A croissant in Paris.', upvotes: 500, replies: []}, {id: 'travel1b', author: 'Samantha Brown', initials: 'SB', avatar: 'linear-gradient(135deg, #10B981 0%, #3B82F6 100%)', role: 'Travel Host', time: '2 days ago', content: 'A taco in Mexico City.', upvotes: 400, replies: []}] },
+            { id: 'travel-2', badge: 'help', author: 'Rick Steves', title: 'How to pack light for a long trip?', content: 'I am going on a 3-month trip and I want to pack light. Any tips?', tags: ['Packing', 'Minimalism'], views: 2000, initialComments: 2, upvotes: 1500, comments: [{id: 'travel2a', author: 'Anthony Bourdain', initials: 'AB', avatar: 'linear-gradient(135deg, #3B82F6 0%, #10B981 100%)', role: 'Chef', time: '3 days ago', content: 'Pack less than you think you need.', upvotes: 400, replies: []}, {id: 'travel2b', author: 'Samantha Brown', initials: 'SB', avatar: 'linear-gradient(135deg, #10B981 0%, #3B82F6 100%)', role: 'Travel Host', time: '4 days ago', content: 'Roll your clothes.', upvotes: 300, replies: []}] },
+            { id: 'travel-3', badge: 'discussion', author: 'Samantha Brown', title: 'What is the most beautiful place you have ever been to?', content: 'For me, it was the Cliffs of Moher in Ireland. What about you?', tags: ['Scenery', 'Nature'], views: 4000, initialComments: 2, upvotes: 2500, comments: [{id: 'travel3a', author: 'Anthony Bourdain', initials: 'AB', avatar: 'linear-gradient(135deg, #3B82F6 0%, #10B981 100%)', role: 'Chef', time: '5 days ago', content: 'The Great Wall of China.', upvotes: 600, replies: []}, {id: 'travel3b', author: 'Rick Steves', initials: 'RS', avatar: 'linear-gradient(135deg, #10B981 0%, #3B82F6 100%)', role: 'Travel Writer', time: '6 days ago', content: 'The Swiss Alps.', upvotes: 500, replies: []}] },
+            { id: 'travel-4', badge: 'help', author: 'Bear Grylls', title: 'How to survive in the wild?', content: 'I am planning a camping trip and I want to be prepared. What are some essential survival skills?', tags: ['Survival', 'Outdoors'], views: 5000, initialComments: 2, upvotes: 3000, comments: [{id: 'travel4a', author: 'Anthony Bourdain', initials: 'AB', avatar: 'linear-gradient(135deg, #3B82F6 0%, #10B981 100%)', role: 'Chef', time: '1 week ago', content: 'Know how to build a fire.', upvotes: 800, replies: []}, {id: 'travel4b', author: 'Rick Steves', initials: 'RS', avatar: 'linear-gradient(135deg, #10B981 0%, #3B82F6 100%)', role: 'Travel Writer', time: '1 week ago', content: 'Bring a map and compass.', upvotes: 700, replies: []}] },
+            { id: 'travel-5', badge: 'announcement', author: 'Admin', title: 'New photo contest!', content: 'Share your best travel photos for a chance to win a prize!', tags: ['Contest', 'Photography'], views: 1000, initialComments: 2, upvotes: 500, comments: [{id: 'travel5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '2 weeks ago', content: 'Good luck to all participants!', upvotes: 100, replies: []}, {id: 'travel5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '2 weeks ago', content: 'I am so excited for this!', upvotes: 80, replies: []}] }
+          ]
+        },
+        movies: {
+          name: '🎬 Movies & TV Shows',
+          stats: '18.9K members • 980 posts',
+          description: 'Discussions, reviews, and recommendations for all things film and television.',
+          icon: '🎬',
+          gradient: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)',
+          activity: 'Extremely active',
+          posts: [
+            { id: 'movie-1', badge: 'discussion', author: 'Quentin Tarantino', title: 'What is the greatest movie ever made?', content: 'For me, it is The Good, the Bad and the Ugly. What about you?', tags: ['Film', 'Cinema'], views: 8000, initialComments: 2, upvotes: 6000, comments: [{id: 'movie1a', author: 'Martin Scorsese', initials: 'MS', avatar: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)', role: 'Director', time: '1 day ago', content: 'The Godfather.', upvotes: 1500, replies: []}, {id: 'movie1b', author: 'Christopher Nolan', initials: 'CN', avatar: 'linear-gradient(135deg, #EF4444 0%, #F59E0B 100%)', role: 'Director', time: '2 days ago', content: '2001: A Space Odyssey.', upvotes: 1200, replies: []}] },
+            { id: 'movie-2', badge: 'help', author: 'Martin Scorsese', title: 'How to write a screenplay?', content: 'I have an idea for a movie but I don\'t know how to write a screenplay. Where should I start?', tags: ['Screenwriting', 'Filmmaking'], views: 6000, initialComments: 2, upvotes: 4000, comments: [{id: 'movie2a', author: 'Quentin Tarantino', initials: 'QT', avatar: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)', role: 'Director', time: '3 days ago', content: 'Read screenplays.', upvotes: 1000, replies: []}, {id: 'movie2b', author: 'Christopher Nolan', initials: 'CN', avatar: 'linear-gradient(135deg, #EF4444 0%, #F59E0B 100%)', role: 'Director', time: '4 days ago', content: 'Write every day.', upvotes: 800, replies: []}] },
+            { id: 'movie-3', badge: 'discussion', author: 'Christopher Nolan', title: 'What is the most overrated movie?', content: 'For me, it is Avatar. What about you?', tags: ['Opinion', 'Debate'], views: 10000, initialComments: 2, upvotes: 8000, comments: [{id: 'movie3a', author: 'Quentin Tarantino', initials: 'QT', avatar: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)', role: 'Director', time: '5 days ago', content: 'The English Patient.', upvotes: 2000, replies: []}, {id: 'movie3b', author: 'Martin Scorsese', initials: 'MS', avatar: 'linear-gradient(135deg, #EF4444 0%, #F59E0B 100%)', role: 'Director', time: '6 days ago', content: 'Forrest Gump.', upvotes: 1500, replies: []}] },
+            { id: 'movie-4', badge: 'help', author: 'Wes Anderson', title: 'How to develop a unique visual style?', content: 'I am a new filmmaker and I want to develop a unique visual style. Any tips?', tags: ['Cinematography', 'Directing'], views: 4000, initialComments: 2, upvotes: 2500, comments: [{id: 'movie4a', author: 'Quentin Tarantino', initials: 'QT', avatar: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)', role: 'Director', time: '1 week ago', content: 'Watch a lot of movies.', upvotes: 800, replies: []}, {id: 'movie4b', author: 'Martin Scorsese', initials: 'MS', avatar: 'linear-gradient(135deg, #EF4444 0%, #F59E0B 100%)', role: 'Director', time: '1 week ago', content: 'Study art.', upvotes: 700, replies: []}] },
+            { id: 'movie-5', badge: 'announcement', author: 'Admin', title: 'New community watch party!', content: 'We are watching The Godfather this Friday. Join us!', tags: ['Event', 'Watch Party'], views: 2000, initialComments: 2, upvotes: 1500, comments: [{id: 'movie5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '2 weeks ago', content: 'Please RSVP so we can get a headcount.', upvotes: 200, replies: []}, {id: 'movie5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '2 weeks ago', content: 'I am so excited for this!', upvotes: 150, replies: []}] }
+          ]
+        },
+        books: {
+          name: '📚 Books & Literature',
+          stats: '11.7K members • 450 posts',
+          description: 'A community for book lovers to discuss their favorite reads.',
+          icon: '📚',
+          gradient: 'linear-gradient(135deg, #4F46E5 0%, #EC4899 100%)',
+          activity: 'Very active',
+          posts: [
+            { id: 'book-1', badge: 'discussion', author: 'Stephen King', title: 'What is the scariest book you have ever read?', content: 'For me, it is The Shining. What about you?', tags: ['Horror', 'Thriller'], views: 6000, initialComments: 2, upvotes: 4000, comments: [{id: 'book1a', author: 'J.K. Rowling', initials: 'JKR', avatar: 'linear-gradient(135deg, #4F46E5 0%, #EC4899 100%)', role: 'Author', time: '1 day ago', content: 'It.', upvotes: 1000, replies: []}, {id: 'book1b', author: 'George R.R. Martin', initials: 'GRRM', avatar: 'linear-gradient(135deg, #EC4899 0%, #4F46E5 100%)', role: 'Author', time: '2 days ago', content: 'The Haunting of Hill House.', upvotes: 800, replies: []}] },
+            { id: 'book-2', badge: 'help', author: 'J.K. Rowling', title: 'How to get over writer\'s block?', content: 'I have been staring at a blank page for hours. Any tips?', tags: ['Writing', 'Creativity'], views: 4000, initialComments: 2, upvotes: 2500, comments: [{id: 'book2a', author: 'Stephen King', initials: 'SK', avatar: 'linear-gradient(135deg, #4F46E5 0%, #EC4899 100%)', role: 'Author', time: '3 days ago', content: 'Write every day.', upvotes: 800, replies: []}, {id: 'book2b', author: 'George R.R. Martin', initials: 'GRRM', avatar: 'linear-gradient(135deg, #EC4899 0%, #4F46E5 100%)', role: 'Author', time: '4 days ago', content: 'Take a walk.', upvotes: 600, replies: []}] },
+            { id: 'book-3', badge: 'discussion', author: 'George R.R. Martin', title: 'What is the best fantasy series?', content: 'For me, it is The Lord of the Rings. What about you?', tags: ['Fantasy', 'Sci-Fi'], views: 8000, initialComments: 2, upvotes: 6000, comments: [{id: 'book3a', author: 'Stephen King', initials: 'SK', avatar: 'linear-gradient(135deg, #4F46E5 0%, #EC4899 100%)', role: 'Author', time: '5 days ago', content: 'The Dark Tower.', upvotes: 1500, replies: []}, {id: 'book3b', author: 'J.K. Rowling', initials: 'JKR', avatar: 'linear-gradient(135deg, #EC4899 0%, #4F46E5 100%)', role: 'Author', time: '6 days ago', content: 'Harry Potter.', upvotes: 1200, replies: []}] },
+            { id: 'book-4', badge: 'help', author: 'Haruki Murakami', title: 'How to read more books?', content: 'I want to read more books but I don\'t have a lot of time. Any tips?', tags: ['Reading', 'Habits'], views: 2000, initialComments: 2, upvotes: 1500, comments: [{id: 'book4a', author: 'Stephen King', initials: 'SK', avatar: 'linear-gradient(135deg, #4F46E5 0%, #EC4899 100%)', role: 'Author', time: '1 week ago', content: 'Carry a book with you everywhere.', upvotes: 400, replies: []}, {id: 'book4b', author: 'J.K. Rowling', initials: 'JKR', avatar: 'linear-gradient(135deg, #EC4899 0%, #4F46E5 100%)', role: 'Author', time: '1 week ago', content: 'Set a daily goal.', upvotes: 300, replies: []}] },
+            { id: 'book-5', badge: 'announcement', author: 'Admin', title: 'New book club!', content: 'We are reading The Hitchhiker\'s Guide to the Galaxy this month. Join us!', tags: ['Book Club', 'Event'], views: 1000, initialComments: 2, upvotes: 500, comments: [{id: 'book5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '2 weeks ago', content: 'Please RSVP so we can get a headcount.', upvotes: 100, replies: []}, {id: 'book5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '2 weeks ago', content: 'I am so excited for this!', upvotes: 80, replies: []}] }
+          ]
+        },
+        music: {
+          name: '🎵 Music & Audio',
+          stats: '14.2K members • 670 posts',
+          description: 'Share your favorite music, artists, and gear.',
+          icon: '🎵',
+          gradient: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)',
+          activity: 'Extremely active',
+          posts: [
+            { id: 'music-1', badge: 'discussion', author: 'Kanye West', title: 'What is the greatest album of all time?', content: 'For me, it is My Beautiful Dark Twisted Fantasy. What about you?', tags: ['Music', 'Albums'], views: 9000, initialComments: 2, upvotes: 7000, comments: [{id: 'music1a', author: 'Rick Rubin', initials: 'RR', avatar: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)', role: 'Producer', time: '1 day ago', content: 'Sgt. Pepper\'s Lonely Hearts Club Band.', upvotes: 1500, replies: []}, {id: 'music1b', author: 'Taylor Swift', initials: 'TS', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)', role: 'Singer-Songwriter', time: '2 days ago', content: 'Blue by Joni Mitchell.', upvotes: 1200, replies: []}] },
+            { id: 'music-2', badge: 'help', author: 'Rick Rubin', title: 'How to produce music?', content: 'I want to learn how to produce music but I don\'t know where to start. Any tips?', tags: ['Music Production', 'DAW'], views: 7000, initialComments: 2, upvotes: 5000, comments: [{id: 'music2a', author: 'Kanye West', initials: 'KW', avatar: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)', role: 'Producer', time: '3 days ago', content: 'Learn an instrument.', upvotes: 1000, replies: []}, {id: 'music2b', author: 'Taylor Swift', initials: 'TS', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)', role: 'Singer-Songwriter', time: '4 days ago', content: 'Start with GarageBand.', upvotes: 800, replies: []}] },
+            { id: 'music-3', badge: 'discussion', author: 'Taylor Swift', title: 'What is the most underrated artist?', content: 'For me, it is Carly Rae Jepsen. What about you?', tags: ['Artists', 'Discovery'], views: 11000, initialComments: 2, upvotes: 9000, comments: [{id: 'music3a', author: 'Kanye West', initials: 'KW', avatar: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)', role: 'Producer', time: '5 days ago', content: 'Bon Iver.', upvotes: 2000, replies: []}, {id: 'music3b', author: 'Rick Rubin', initials: 'RR', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)', role: 'Producer', time: '6 days ago', content: 'FKA Twigs.', upvotes: 1500, replies: []}] },
+            { id: 'music-4', badge: 'help', author: 'Questlove', title: 'How to find new music?', content: 'I am tired of listening to the same songs over and over again. How do you find new music?', tags: ['Music Discovery', 'Playlists'], views: 5000, initialComments: 2, upvotes: 3000, comments: [{id: 'music4a', author: 'Kanye West', initials: 'KW', avatar: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)', role: 'Producer', time: '1 week ago', content: 'Spotify\'s Discover Weekly.', upvotes: 800, replies: []}, {id: 'music4b', author: 'Rick Rubin', initials: 'RR', avatar: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)', role: 'Producer', time: '1 week ago', content: 'Bandcamp.', upvotes: 700, replies: []}] },
+            { id: 'music-5', badge: 'announcement', author: 'Admin', title: 'New community playlist!', content: 'We are creating a community playlist. Add your favorite songs!', tags: ['Playlist', 'Collaboration'], views: 3000, initialComments: 2, upvotes: 2000, comments: [{id: 'music5a', author: 'Moderator', initials: 'M', avatar: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', role: 'Community Moderator', time: '2 weeks ago', content: 'Please keep it clean!', upvotes: 200, replies: []}, {id: 'music5b', author: 'Anonymous User', initials: 'AU', avatar: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', role: 'Member', time: '2 weeks ago', content: 'This is a great idea!', upvotes: 150, replies: []}] }
+          ]
+        }
+      };
+
+      function displayCommunities() {
+        const grid = document.getElementById('communities-grid');
+        grid.innerHTML = '';
+        const communityKeys = Object.keys(communities);
+        const totalPages = Math.ceil(communityKeys.length / itemsPerPage);
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageKeys = communityKeys.slice(startIndex, endIndex);
+
+        pageKeys.forEach(key => {
+          const comm = communities[key];
+          const card = document.createElement('div');
+          card.className = 'community-card';
+          card.onclick = () => viewCommunity(key);
+          card.innerHTML = `
+            <div class="community-card-content">
+              <div class="community-header">
+                <div class="community-icon" style="background:${comm.gradient}">${comm.icon}</div>
+                <div class="community-info">
+                  <h3>${comm.name.replace(/^.{2}\s/, '')}</h3>
+                  <p>${comm.activity}</p>
+                </div>
+              </div>
+              <p class="community-description">${comm.description}</p>
+              <div class="community-stats">
+                <div class="community-stat"><strong>${comm.stats.split('•')[0].trim()}</strong></div>
+                <div class="community-stat"><strong>${comm.stats.split('•')[1].trim()}</strong></div>
+              </div>
+            </div>
+            <button class="btn ${joinedCommunities[key] ? 'btn-joined' : 'btn-join'}" id="${key}-btn" onclick="event.stopPropagation(); joinCommunity('${key}')">${joinedCommunities[key] ? '✓ Joined' : 'Join Community'}</button>
+          `;
+          grid.appendChild(card);
+        });
+
+        document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('prev-page-btn').disabled = currentPage === 1;
+        document.getElementById('next-page-btn').disabled = currentPage === totalPages;
+      }
+      
+      function nextPage() {
+        const totalPages = Math.ceil(Object.keys(communities).length / itemsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          displayCommunities();
+        }
+      }
+
+      function prevPage() {
+        if (currentPage > 1) {
+          currentPage--;
+          displayCommunities();
+        }
+      }
+
+      function joinCommunity(communityId) {
+        const btn = document.getElementById(communityId + '-btn');
+        joinedCommunities[communityId] = !joinedCommunities[communityId];
+        btn.textContent = joinedCommunities[communityId] ? '✓ Joined' : 'Join Community';
+        btn.className = 'btn ' + (joinedCommunities[communityId] ? 'btn-joined' : 'btn-join');
+      }
+
+      function viewCommunity(communityId) {
+        showCommunityPosts(communityId);
+      }
+
+      function showCommunityPosts(communityId) {
+        currentCommunity = communityId;
+        const comm = communities[communityId];
+        document.getElementById('community-name').textContent = comm.name;
+        document.getElementById('community-stats').textContent = comm.stats;
+
+        const postsContainer = document.getElementById('posts-container');
+        postsContainer.innerHTML = '';
+        comm.posts.forEach(post => {
+          const postCard = document.createElement('div');
+          postCard.className = 'post-card';
+          postCard.onclick = () => openPost(communityId, post.id);
+          
+          let badgeClass = '', badgeText = '';
+          switch (post.badge) {
+              case 'help': badgeClass = 'help-badge'; badgeText = '🆘 Need Help'; break;
+              case 'discussion': badgeClass = 'discussion-badge'; badgeText = '💬 Discussion'; break;
+              case 'announcement': badgeClass = 'announcement-badge'; badgeText = '📢 Announcement'; break;
+          }
+
+          postCard.innerHTML = `
+            <div class="${badgeClass}">${badgeText}</div>
+            <div class="post-header"><div class="post-user-info"><h4>${post.title}</h4><p class="post-meta">by ${post.author}</p></div></div>
+            <div class="post-content">${post.content.substring(0, 100)}...</div>
+          `;
+          postsContainer.appendChild(postCard);
+        });
+
+        document.getElementById('communities-view').classList.add('hidden');
+        document.getElementById('community-posts-view').classList.remove('hidden');
+        window.scrollTo(0, 0);
+      }
+
+      function backToCommunities() {
+        document.getElementById('community-posts-view').classList.add('hidden');
+        document.getElementById('post-detail-view').classList.add('hidden');
+        document.getElementById('communities-view').classList.remove('hidden');
+        window.scrollTo(0, 0);
+      }
+
+      function openPost(communityId, postId) {
+        currentCommunity = communityId;
+        currentPost = postId;
+        const post = communities[communityId].posts.find(p => p.id === postId);
+
+        if (!postVotes[postId]) postVotes[postId] = { upvoted: false, count: post.upvotes };
+        if (!postSaves[postId]) postSaves[postId] = false;
+
+        let badgeClass = '', badgeText = '';
+        switch (post.badge) {
+            case 'help': badgeClass = 'help-badge'; badgeText = '🆘 Need Help'; break;
+            case 'discussion': badgeClass = 'discussion-badge'; badgeText = '💬 Discussion'; break;
+            case 'announcement': badgeClass = 'announcement-badge'; badgeText = '📢 Announcement'; break;
+        }
+
+        const detailContainer = document.getElementById('post-detail-container');
+        detailContainer.innerHTML = `
+          <div class="${badgeClass}">${badgeText}</div>
+          <h1 class="post-detail-title">${post.title}</h1>
+          <p class="post-meta">by ${post.author}</p>
+          <div class="post-detail-content">${post.content}</div>
+          <div class="post-tags">${post.tags.map(t => `<span class="post-tag">${t}</span>`).join('')}</div>
+          <div class="post-actions">
+            <button class="action-btn ${postVotes[postId].upvoted ? 'active' : ''}" id="upvote-btn" onclick="toggleUpvote()">⬆️ Upvote (<span id="upvote-count">${postVotes[postId].count}</span>)</button>
+            <button class="action-btn" onclick="document.getElementById('comment-text').focus()">💬 Comment</button>
+            <button class="action-btn ${postSaves[postId] ? 'active' : ''}" id="save-btn" onclick="toggleSave()">${postSaves[postId] ? '🔖 Saved' : '🔖 Save'}</button>
+            <button class="action-btn" onclick="openShareModal()">⋯ Share</button>
+          </div>
+        `;
+        
+        renderComments(post);
+
+        document.getElementById('community-posts-view').classList.add('hidden');
+        document.getElementById('post-detail-view').classList.remove('hidden');
+        window.scrollTo(0, 0);
+      }
+      
+      function backToPosts() {
+        document.getElementById('post-detail-view').classList.add('hidden');
+        document.getElementById('community-posts-view').classList.remove('hidden');
+      }
+
+      function toggleUpvote() {
+        const voteData = postVotes[currentPost];
+        voteData.upvoted = !voteData.upvoted;
+        voteData.count += voteData.upvoted ? 1 : -1;
+        document.getElementById('upvote-btn').classList.toggle('active');
+        document.getElementById('upvote-count').textContent = voteData.count;
+      }
+
+      function toggleSave() {
+        postSaves[currentPost] = !postSaves[currentPost];
+        const btn = document.getElementById('save-btn');
+        btn.classList.toggle('active');
+        btn.textContent = postSaves[currentPost] ? '🔖 Saved' : '🔖 Save';
+      }
+
+      function openShareModal() {
+        const shareList = document.getElementById('share-list');
+        shareList.innerHTML = Object.keys(joinedCommunities)
+          .filter(k => joinedCommunities[k] && k !== currentCommunity)
+          .map(k => {
+            const comm = communities[k];
+            return `<li class="share-item" onclick="shareToComm('${k}')">
+              <div class="share-icon" style="background:${comm.gradient}">${comm.icon}</div>
+              <div><strong>${comm.name.replace(/^.{2}\s/, '')}</strong><br><small>${comm.stats.split('•')[0].trim()}</small></div>
+            </li>`;
+          }).join('') || '<p style="text-align:center;color:#999;">Join a community to share this post!</p>';
+        document.getElementById('shareModal').classList.add('active');
+      }
+
+      function closeShareModal() { document.getElementById('shareModal').classList.remove('active'); }
+      function shareToComm(commKey) { alert(`Post shared to ${communities[commKey].name}!`); closeShareModal(); }
+
+      function updateCharCount() {
+        const textarea = document.getElementById('comment-text');
+        const count = textarea.value.length;
+        document.getElementById('char-count').textContent = `${count} character${count !== 1 ? 's' : ''}`;
+        document.getElementById('post-btn').disabled = count === 0;
+      }
+
+      function postComment() {
+        const textarea = document.getElementById('comment-text');
+        const post = communities[currentCommunity].posts.find(p => p.id === currentPost);
+        post.comments.unshift({
+          id: `c-${Date.now()}`, author: 'Joel Davis', initials: 'JD', avatar: 'linear-gradient(135deg,#001f3f 0%,#003366 100%)',
+          role: 'Student', time: 'Just now', content: textarea.value.trim(), upvotes: 0, replies: []
+        });
+        post.initialComments++;
+        renderComments(post);
+        textarea.value = '';
+        updateCharCount();
+        document.getElementById('success-message').classList.remove('hidden');
+        setTimeout(() => document.getElementById('success-message').classList.add('hidden'), 3000);
+      }
+
+      function showReplyForm(commentId) {
+        const existingForm = document.getElementById('reply-form-active');
+        if (existingForm) existingForm.remove();
+        const container = document.getElementById(`reply-container-${commentId}`);
+        container.innerHTML = `
+          <div class="reply-form" id="reply-form-active">
+            <textarea placeholder="Write a reply..."></textarea>
+            <button onclick="postReply('${commentId}')">Post Reply</button>
+          </div>`;
+        container.querySelector('textarea').focus();
+      }
+
+      function postReply(parentCommentId) {
+        const textarea = document.getElementById('reply-form-active').querySelector('textarea');
+        const post = communities[currentCommunity].posts.find(p => p.id === currentPost);
+        const parentComment = findComment(post.comments, parentCommentId);
+        parentComment.replies.push({
+          id: `c-${Date.now()}`, author: 'Joel Davis', initials: 'JD', avatar: 'linear-gradient(135deg,#001f3f 0%,#003366 100%)',
+          role: 'Student', time: 'Just now', content: textarea.value.trim(), upvotes: 0, replies: []
+        });
+        post.initialComments++;
+        renderComments(post);
+      }
+      
+      function deleteComment(commentId) {
+        if (!confirm("Are you sure you want to delete this comment?")) return;
+        const post = communities[currentCommunity].posts.find(p => p.id === currentPost);
+        
+        function findAndDelete(comments) {
+          for (let i = 0; i < comments.length; i++) {
+            if (comments[i].id === commentId) {
+              const count = 1 + (comments[i].replies ? countReplies(comments[i].replies) : 0);
+              comments.splice(i, 1);
+              return count;
+            }
+            if (comments[i].replies) {
+              const deletedCount = findAndDelete(comments[i].replies);
+              if (deletedCount) return deletedCount;
+            }
+          }
+          return 0;
+        }
+        const deletedCount = findAndDelete(post.comments);
+        post.initialComments -= deletedCount;
+        renderComments(post);
+      }
+      
+      function countReplies(replies) {
+          let count = replies.length;
+          replies.forEach(reply => {
+              if (reply.replies) count += countReplies(reply.replies);
+          });
+          return count;
+      }
+
+      function findComment(comments, commentId) {
+        for (const comment of comments) {
+          if (comment.id === commentId) return comment;
+          if (comment.replies) {
+            const found = findComment(comment.replies, commentId);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+
+      function ensureCommentMeta(comment, postId) {
+        if (!comment.id) comment.id = `${postId}-${Math.random()}`;
+        if (!comment.replies) comment.replies = [];
+        if (!commentVotes[comment.id]) commentVotes[comment.id] = { upvoted: false, count: comment.upvotes || 0 };
+      }
+
+      function toggleCommentUpvote(commentId) {
+        const voteData = commentVotes[commentId];
+        voteData.upvoted = !voteData.upvoted;
+        voteData.count += voteData.upvoted ? 1 : -1;
+        document.getElementById(`comment-upvote-btn-${commentId}`).classList.toggle('active');
+        document.getElementById(`comment-upvote-count-${commentId}`).textContent = voteData.count;
+      }
+      
+      function createCommentHTML(comment) {
+        ensureCommentMeta(comment, currentPost);
+        const voteData = commentVotes[comment.id];
+        const deleteButton = comment.author === 'Joel Davis' 
+            ? `<span class="comment-action comment-action-delete" onclick="deleteComment('${comment.id}')">Delete</span>` 
+            : '';
+        return `
+          <div class="comment-header">
+            <div class="comment-avatar" style="background:${comment.avatar}">${comment.initials}</div>
+            <div class="comment-user-info"><h4>${comment.author}</h4><p>${comment.role} • ${comment.time}</p></div>
+          </div>
+          <p class="comment-content">${comment.content}</p>
+          <div class="comment-actions">
+            <span id="comment-upvote-btn-${comment.id}" class="comment-action ${voteData.upvoted ? 'active' : ''}" onclick="toggleCommentUpvote('${comment.id}')">▲ Upvote (<span id="comment-upvote-count-${comment.id}">${voteData.count}</span>)</span>
+            <span class="comment-action" onclick="showReplyForm('${comment.id}')">Reply</span>
+            ${deleteButton}
+          </div>
+          <div id="reply-container-${comment.id}"></div>
+        `;
+      }
+
+      function renderComments(post) {
+          const container = document.getElementById('existing-comments');
+          container.innerHTML = '';
+          document.getElementById('comments-count').textContent = `Comments (${post.initialComments})`;
+
+          function render(comments, parentElement) {
+              comments.forEach(comment => {
+                  const card = document.createElement('div');
+                  card.className = 'comment-card';
+                  if (comment.time === 'Just now') card.classList.add('new-comment');
+                  card.innerHTML = createCommentHTML(comment);
+                  parentElement.appendChild(card);
+                  if (comment.replies && comment.replies.length > 0) {
+                      const repliesContainer = document.createElement('div');
+                      repliesContainer.className = 'replies-container';
+                      card.appendChild(repliesContainer);
+                      render(comment.replies, repliesContainer);
+                  }
+              });
+          }
+          if(post.comments) {
+            render(post.comments, container);
+          }
+      }
+
+      window.addEventListener('click', (e) => { if (e.target === document.getElementById('shareModal')) closeShareModal(); });
+      document.addEventListener('DOMContentLoaded', () => {
+          displayCommunities();
+      });
+    </script>
+  </body>
+</html>
