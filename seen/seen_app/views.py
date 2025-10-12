@@ -18,6 +18,10 @@ def communities(request):
     template = loader.get_template('seen_communities_page.html')
     return HttpResponse(template.render())
 
-def publish_project(request):
+def add_project(request):
+    template = loader.get_template('seen_add_project.html')
+    return HttpResponse(template.render())
+
+def manual_project(request):
     template = loader.get_template('seen_publish_project.html')
     return HttpResponse(template.render())
