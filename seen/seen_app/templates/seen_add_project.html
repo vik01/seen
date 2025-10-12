@@ -122,7 +122,7 @@
             font-size: 24px;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
             line-height: 1.3;
         }
 
@@ -261,9 +261,22 @@
 
     <script>
         function connectAccount(platform) {
-            alert('Connecting to ' + platform.charAt(0).toUpperCase() + platform.slice(1) + '...');
-            // Add your connection logic here
+            const urls = {
+                'github': 'https://github.com/',
+                'behance': 'https://www.behance.net/onboarding/hirerCreative',
+                'fiverr': 'https://www.fiverr.com/',
+                'upwork': 'https://www.upwork.com/'
+            };
+            
+            // Open the external platform in a new tab
+            window.open(urls[platform], '_blank');
+            
+            // Redirect current page to connection waiting page using Django URL
+            // const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+            // window.location.href = `connecting_project/?platform=${platformName}`;
+            window.location.href = "connecting_project/";
         }
+
     </script>
 </body>
 </html>

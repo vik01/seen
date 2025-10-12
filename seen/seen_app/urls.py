@@ -8,5 +8,6 @@ urlpatterns = [
     path('communities/', views.communities, name='communities'),
     path('add_project/', views.add_project, name='add_project'),
     path('add_project/add_manual_project/', views.manual_project, name='add_manual_project'),
-    
+    path('add_project/connecting_project/', views.connect_waiting, name='connecting_project'),
+    path('update_profile/', views.update_profile, name='update_profile'),
 ]

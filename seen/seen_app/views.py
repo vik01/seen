@@ -14,6 +14,10 @@ def profile(request):
     template = loader.get_template('seen_profile_page.html')
     return HttpResponse(template.render())
 
+def update_profile(request):
+    template = loader.get_template('seen_profile_page_stage_2.html')
+    return HttpResponse(template.render())
+
 def communities(request):
     template = loader.get_template('seen_communities_page.html')
     return HttpResponse(template.render())
@@ -25,3 +29,10 @@ def add_project(request):
 def manual_project(request):
     template = loader.get_template('seen_publish_project.html')
     return HttpResponse(template.render())
+
+def connect_waiting(request):
+    template = loader.get_template('connecting_project.html')
+    return HttpResponse(template.render())
+
+    # platform = request.GET.get('platform', '')
+    # return render(request, 'connecting_project.html', {'platform': platform})
