@@ -271,11 +271,12 @@
             // Open the external platform in a new tab
             window.open(urls[platform], '_blank');
             
-            // Redirect current page to connection waiting page
-            const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-            window.location.href = `connect_waiting.html?platform=${platformName}`;
+            // Redirect current page to connection waiting page using Django URL
+            // const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+            // window.location.href = `connecting_project/?platform=${platformName}`;
+            window.location.href = "connecting_project/";
         }
-        
+
     </script>
 </body>
 </html>

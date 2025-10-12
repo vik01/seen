@@ -170,8 +170,10 @@
         <div class="connection-box">
             <h2>Connecting Your Account</h2>
             <p class="connection-text">
-                We have opened another tab to connect your <span class="platform-name" id="platformName">account</span> to your Seen account. 
+                We have opened another tab to connect your account to your Seen account. 
                 Please follow the instructions and once you have connected, click the continue button to see your updated profile.
+                <!-- We have opened another tab to connect your <span class="platform-name" id="platformName">account</span> to your Seen account. 
+                Please follow the instructions and once you have connected, click the continue button to see your updated profile. -->
             </p>
             <button class="continue-button" onclick="continueToProfile()">Continue</button>
         </div>
@@ -188,7 +190,7 @@
 
         function continueToProfile() {
             // Redirect to profile page or wherever you want
-            window.location.href = 'seen_profile_page.html';
+            window.location.href = '../../update_profile/';
             // Or you can use: window.location.href = 'profile.html';
         }
     </script>
